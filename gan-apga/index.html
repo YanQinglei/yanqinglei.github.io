@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation | BulingQAQ的个人博客</title><meta name="author" content="BulingQAQ"><meta name="copyright" content="BulingQAQ"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="0. Abstract  背景： 超声图像在结构上存在不足，使得生成网络难以捕捉其结构，导致生成的图像缺乏结构合法性。 工作： 本文提出了一种用于结构不足医学影像数据增强的渐进生成对抗方法，包括一种网络和一种策略。我们的渐进纹理生成对抗网络缓解了生成过程中完全截断结构和纹理重建的负面影响，并增强了结构与纹理之间的隐式关联。 基于掩码重建的图像数据增强策略从新颖的角度克服了数据不平衡问题，保持了生成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation">
+<meta property="og:url" content="https://yanqinglei.github.io/gan-apga/">
+<meta property="og:site_name" content="BulingQAQ的个人博客">
+<meta property="og:description" content="0. Abstract  背景： 超声图像在结构上存在不足，使得生成网络难以捕捉其结构，导致生成的图像缺乏结构合法性。 工作： 本文提出了一种用于结构不足医学影像数据增强的渐进生成对抗方法，包括一种网络和一种策略。我们的渐进纹理生成对抗网络缓解了生成过程中完全截断结构和纹理重建的负面影响，并增强了结构与纹理之间的隐式关联。 基于掩码重建的图像数据增强策略从新颖的角度克服了数据不平衡问题，保持了生成">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png">
+<meta property="article:published_time" content="2025-03-13T11:21:07.000Z">
+<meta property="article:modified_time" content="2025-03-13T11:22:58.722Z">
+<meta property="article:author" content="BulingQAQ">
+<meta property="article:tag" content="GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png"><link rel="shortcut icon" href="/img/icon.png"><link rel="canonical" href="https://yanqinglei.github.io/gan-apga/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-13 19:22:58'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"><link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/spy_family_avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/life/"><i class="fa-fw fa fa-camera"></i><span> 生活</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png')"><nav id="nav"><span id="blog-info"><a href="/" title="BulingQAQ的个人博客"><span class="site-name">BulingQAQ的个人博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/life/"><i class="fa-fw fa fa-camera"></i><span> 生活</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-03-13T11:21:07.000Z" title="发表于 2025-03-13 19:21:07">2025-03-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-13T11:22:58.722Z" title="更新于 2025-03-13 19:22:58">2025-03-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90/">图像生成</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">5.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>17分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="0-abstract">0. Abstract</h1>
+<hr>
+<h3 id="背景：">背景：</h3>
+<p>超声图像在结构上存在不足，使得生成网络难以捕捉其结构，导致生成的图像缺乏结构合法性。</p>
+<h3 id="工作：">工作：</h3>
+<p>本文提出了一种用于结构不足医学影像数据增强的渐进生成对抗方法，包括一种网络和一种策略。我们的<strong>渐进纹理生成对抗网络</strong>缓解了生成过程中完全截断结构和纹理重建的负面影响，并增强了结构与纹理之间的隐式关联。<br>
+<strong>基于掩码重建的图像数据增强策略</strong>从新颖的角度克服了数据不平衡问题，保持了生成数据中结构的合法性，并增加了疾病数据的可解释多样性。</p>
+<h3 id="结果：">结果：</h3>
+<p>实验在定性和定量上证明了我们的方法在结构不足医学影像数据增强和图像重建方面的有效性。<br>
+最后，病变的弱监督分割是我们方法的额外贡献。</p>
+<h1 id="1-introduction">1. INTRODUCTION</h1>
+<hr>
+<ul>
+<li>辅助诊断研究（Auxiliary Diagnosis research based on Deep Learning, ADDL）已经接近甚至超越了医生的表现。</li>
+<li>传统增强（Traditional Augmentation, TA）</li>
+<li>合成增强（Synthetic Augmentation, SA）</li>
+<li>感兴趣区域（Region Of Interest, ROI）</li>
+</ul>
+<p>TA分为两类：几何变换和颜色变换。<br>
+SA分为两类：基于插值的合成方法和基于生成模型的合成方法。</p>
+<p>基于插值的方法包括SMOTE[2]、SamplePairing[3]和mixup[4]。<br>
+基于生成对抗网络（GAN）的生成增强方法在一定程度上实现了样本空间外的数据增强。</p>
+<p>超声图像具有成像角度和尺度灵活多变的优势。但从另一角度来看，超声数据的结构不完善，导致生成的样本在超声图像中缺乏合法性。</p>
+<p>图1中的甲状腺超声图像是我们先前研究的生成结果，其中气管和动脉的位置及特征完全偏离。<br>
+本文聚焦于甲状腺超声图像，旨在解决基于生成的增强方法难以维持结构合法性的问题。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121058739.png" alt="image.png"></p>
+<p>本文提出了一个强有力的假设：<strong>医学图像 = 局部人体结构 + 组织纹理</strong>。<br>
+针对结构不一致的数据建模，生成模型只能学习到相对统一的纹理。<br>
+本文提出了一种<strong>用于结构不完整医学图像数据增强的渐进生成对抗方法（Progressive Generative Adversarial Metho, PGAM）</strong>，<br>
+该方法通过修复病变数据中的病灶来增强正常数据，并通过**条件类别敏感策略（Conditional Category-Sensitive Strategy）**缓解病变数据之间的不平衡。整个过程仅使用图像级标注和病灶的点标注（医生在超声检查中用于测量病灶大小的标注，如图2(a)所示）。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png" alt="image.png"></p>
+<p>本文的贡献如下：</p>
+<ol>
+<li>针对结构不完整图像的数据增强任务，提出了一种<strong>渐进生成对抗方法</strong>，在保留合法结构的前提下完成图像增强；</li>
+<li>提出了一种<strong>渐进纹理生成对抗网络（Progressive Texture Generative Adversarial Network, PTGAN）</strong>，该网络集成了结构和纹理的修复过程，对病灶修复和新病灶合成具有有益效果；</li>
+<li>提出了一种<strong>基于掩膜重建的图像数据增强策略（Image Data Augmentation Strategy based on MaskReconstruction, MR-IDAS）</strong>，其中条件类别敏感策略在先验指导下增加了病灶样本分布的多样性；</li>
+<li>该方法还可以通过<strong>点标注</strong>实现病灶的弱监督分割。</li>
+</ol>
+<h1 id="2-related-works">2. RELATED WORKS</h1>
+<hr>
+<h2 id="2-1-gan-for-medical-data-augmentation">2.1 GAN for medical data augmentation</h2>
+<hr>
+<p>基于GAN的数据增强方法可分为3类：</p>
+<ol>
+<li><strong>噪声向量</strong>：许多方法通过以<strong>一维噪声向量</strong>为输入，生成虚假的皮肤镜图像[10]、MRI图像[14]、胸部X光图像[15]，以增强不平衡的图像数据集。对于较为复杂的数据如超声图像，Al-Dhabyani等人[8]关注于感兴趣区域（ROI），避免了结构不完整的乳腺超声图像所带来的问题。</li>
+<li><strong>分割掩码</strong>：这些方法多用于细胞图像生成[9]、[16]以及CT图像生成[17]。尽管掩码限制了新样本中病变的形状，但无法控制病变范围之外的结构。</li>
+<li><strong>真实图像</strong>：这类方法[6]、[7]通过编码和解码使生成器学习真实数据与虚假数据之间的映射关系。其中，[18]将两张图像（异常和正常）合成为一张异常图像，确保了结构的合法性，但其多样性有限。</li>
+</ol>
+<p>大多数基于GAN的医学图像数据增强方法的数据具有一致或松散的结构。<br>
+上述方法在采样潜在特征时<strong>缺乏先验知识</strong>的约束。更具体地说，<strong>样本的多样性</strong>及其在特征空间中<strong>分布的合理性</strong>需要同时考虑。<br>
+因此，值得研究一种针对结构不完整图像的数据增强方法，并权衡生成数据的多样性与分布合理性之间的关系。==<strong>图像修复方法</strong>==为我们提供了灵感。</p>
+<h2 id="2-2-gan-based-image-inpainting-method">2.2 GAN-based Image Inpainting Method</h2>
+<hr>
+<p>基于GAN的图像修复方法包括<strong>单阶段修复</strong>和<strong>多阶段修复</strong>。<br>
+[19]首次将GAN用于图像修复。<br>
+[20]在单阶段恢复的潜在向量z的基础上修复了受损图像。<br>
+[21]认为修复和掩码是一个互补的过程，同时学习有助于两项任务取得更好的结果。<br>
+受[22]的启发，[23]使用两个判别器（一个全局、一个局部）对抗性地去除了MRI中的金属植入物。虽然[24]将图像修复分为内容和纹理两部分，但它本质上是对图像内容的单阶段修复。</p>
+<p>根据第一步修复的内容，多阶段方法可分为：a) 边缘；b) 结构；c) 粗略结果；d) 其他优化策略[25]、[26]。<br>
+首先，[27]–[29]在第一步生成图像的边缘和颜色，并在第二步整合信息以完成修复任务。<br>
+[30]也是一种轮廓补全方法，但它使用了额外的显著性信息。<br>
+[31]在第一阶段修复了图像的整体结构，并在第二阶段修复了细节。<br>
+[32]提出了一种内容+纹理修复的方法。<br>
+[33]提出了从低分辨率到高分辨率的渐进式修复过程。<br>
+[34]引入了一种两阶段由粗到细的网络架构，其中第一个网络进行初始粗略预测，第二个网络以粗略预测为输入并预测精细结果。</p>
+<p>尽管图像结构和纹理分别重建可以提高生成模型的重建性能，但这些元素之间的<strong>隐含关联</strong>和<strong>渐进关系</strong>被忽略了。<br>
+因此，本文以渐进的方式加强了图像结构和纹理之间的增量关系。</p>
+<h1 id="3-methods">3. METHODS</h1>
+<hr>
+<ul>
+<li>渐进纹理生成对抗网络</li>
+<li>基于掩模重建的图像数据增强策略</li>
+<li>仅使用图像级标注和点标注</li>
+</ul>
+<p>我们方法的流程图如图3所示。<br>
+PTGAN 包括 <strong>渐进纹理模块（Progressive Texture Module, PTM）</strong>、<strong>精炼模块（Refining Module, RM）</strong> 和<strong>损失函数</strong>。<br>
+MR-IDAS 包括 针对疾病数据的<strong>条件类别敏感策略（Conditional Category-Sensitive Strategy, CCS）</strong> 和针对正常-疾病数据的<strong>组织纹理重建策略（Tissue Texture Reconstruction Strategy, TTR）</strong>。</p>
+<h2 id="3-1-progressive-texture-gan-overview">3.1 Progressive Texture GAN Overview</h2>
+<hr>
+<p>该方法的核心思想之一是<strong>将结构与纹理的重建过程结合起来，进行渐进式纹理学习</strong>。<br>
+整个模型的损失函数由各模块的损失组成：<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503120945801.png" alt="image.png"><br>
+其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mi>C</mi></msub></mrow><annotation encoding="application/x-tex">L_C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.07153em;">C</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>为交叉熵损失，它在生成疾病数据时对生成器生成特定疾病类别的错误施加惩罚。<br>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mi>P</mi></msub></mrow><annotation encoding="application/x-tex">L_P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>和<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">L_R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>分别为PTM和RM的损失。<br>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mtext>∗</mtext></mrow><annotation encoding="application/x-tex">λ∗</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">λ</span><span class="mord">∗</span></span></span></span>表示每个损失的权重。</p>
+<h3 id="3-1-1-渐近纹理模块">3.1.1 渐近纹理模块</h3>
+<hr>
+<p>该模块由生成器 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mi>P</mi></msub></mrow><annotation encoding="application/x-tex">G_P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和判别器 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>P</mi></msub></mrow><annotation encoding="application/x-tex">D_P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 组成。<br>
+渐进纹理模块（PTM）利用从简单到复杂的不同细节程度的图像结构作为监督。</p>
+<p>训练过程被分解为图像内容的逐步纹理学习。<br>
+我们将原始图像定义为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mrow><mi>g</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">I_{gt}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.28055599999999997em;"><span style="top:-2.5500000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>，掩码定义为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span></span></span></span>。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span></span></span></span> 可以理解为一个简单的二值化矩阵，其中0表示缺失区域，1表示背景。<br>
+图像结构与纹理的融合表示为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">S_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>1</mn><mo separator="true">,</mo><mi>n</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">i ∈ [1, n]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69862em;vertical-align:-0.0391em;"></span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">n</span><span class="mclose">]</span></span></span></span>，表示结构中包含的不同程度的纹理细节。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 表示PTM中的渐进训练次数。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span> 越小，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span></span></span></span> 中包含的高频纹理特征越少，可以通过均值滤波计算。<br>
+如公式（2）所示。<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121136952.png" alt="image.png"></p>
+<p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">k_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 表示滤波器核的大小，(x, y) 表示像素的坐标。为了确保滤波后的图像仍保持原始尺寸，应进行填充操作。<br>
+选择<strong>均值滤波</strong>作为结构-纹理混合的融合方法的原因是，均值滤波不仅可以<strong>减少高频信息</strong>（如斑点噪声）对建模的不利影响，还可以通过调整核大小来<strong>调整纹理细节组合的程度</strong>。图像经过均值滤波后，每个像素具有<strong>更大的感受野</strong>，在反向传播过程中提供<strong>更密集的监督</strong>。</p>
+<p>渐进纹理学习生成器表示为：<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121600684.png" alt="image.png"><br>
+其中 × 表示逐像素乘积。三个元素连接在一起作为网络的输入。<br>
+随着训练的进行，生成器和判别器的联合损失将逐渐被优化。<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503120949121.png" alt="image.png"><br>
+其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>l</mi><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">L_{l1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是重构损失，计算生成结果与S之间的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">l1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord">1</span></span></span></span> 距离，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>P</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></msub></mrow><annotation encoding="application/x-tex">L_{Pd_i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.93343em;vertical-align:-0.2501em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">P</span><span class="mord mtight"><span class="mord mathdefault mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2501em;"><span></span></span></span></span></span></span></span></span></span> 是判别器的对抗损失，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.0037em;">α</span></span></span></span> 是正则化参数。</p>
+<h3 id="3-1-2-精炼模块">3.1.2 精炼模块</h3>
+<hr>
+<p>在 PTM 之后，由于监督信息被过滤以平滑高频信息，因此需要另一个精炼生成器 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">G_R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和相应的判别器 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">D_R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 来在 RM 中生成更逼真的图像。<br>
+整个精炼过程可以表示为：<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503130924540.png" alt="image.png"><br>
+其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi></mrow><annotation encoding="application/x-tex">I</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span></span></span></span> 是最终生成的图像，损失函数可表示为：<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121016367.png" alt="image.png"><br>
+其中，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>l</mi><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">L_{l1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是精细重构损失。借鉴 [35] 的思想，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">L_f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 使用 Appearance Flow，用于比较输入图像中缺失区域 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><msub><mi>F</mi><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></msub><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{F_{x,y}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.232878em;vertical-align:-0.286108em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9467699999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span> 的特征与 Ground Truth 特征 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>F</mi><mrow><mi>x</mi><mo separator="true">,</mo><mi>y</mi></mrow></msub></mrow><annotation encoding="application/x-tex">F_{x,y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 之间的余弦相似度（Sim(·)）。N 是集合 M = 1 中的元素数量。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>R</mi><mi>d</mi></mrow></msub></mrow><annotation encoding="application/x-tex">L_{Rd}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span><span class="mord mathdefault mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是判别器 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">D_R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.00773em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的对抗损失。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi></mrow><annotation encoding="application/x-tex">\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span></span></span></span> 用于调整各损失之间的权重。</p>
+<h2 id="3-2-image-data-augmentation-strategy-overview">3.2 Image Data Augmentation Strategy Overview</h2>
+<hr>
+<p>二值化掩码虽然简单，但对生成的多样化样本贡献有限。<br>
+本文提出的策略通过掩码重建增加了生成疾病数据的<strong>多样性</strong>。</p>
+<h3 id="3-2-1-条件类别敏感策略">3.2.1 条件类别敏感策略</h3>
+<hr>
+<p>我们首先对良性和恶性结节的均值和方差进行了分布统计，发现存在一定差异，如图4所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131010780.png" alt="image.png"></p>
+<p>因此，我们使用公式(12)中的掩码与先验约束进行了新颖的整合。<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131013812.png" alt="image.png"><br>
+其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mn>0</mn><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">M_{0-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.891661em;vertical-align:-0.208331em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.301108em;"><span style="top:-2.5500000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.208331em;"><span></span></span></span></span></span></span></span></span></span> 是一个双通道的 0-1 矩阵，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo stretchy="false">(</mo><msup><mi>I</mi><mi>T</mi></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mu(I^T)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0913309999999998em;vertical-align:-0.25em;"></span><span class="mord mathdefault">μ</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false">(</mo><msup><mi>I</mi><mi>T</mi></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sigma(I^T)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0913309999999998em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 分别表示结节区域内的均值和方差，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⊗</mo></mrow><annotation encoding="application/x-tex">\otimes</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">⊗</span></span></span></span> 是通道间的乘法操作。</p>
+<p>因此，由第 III-A 节模型生成的结果可重写为：<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131014857.png" alt="image.png"></p>
+<p>使用均值和方差的原因在于这两个数值特征具有实际意义，能在一定程度上代表结节的回声和组织成分。<br>
+因此，在数据生成的采样阶段，通过<strong>改变采样的条件分布来实现新样本的多样性</strong>。但同时也需要<strong>遵循数据的先验分布</strong>，以确保特征分布的合理性，如公式 15-18 所示，其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo stretchy="false">(</mo><mo separator="true">⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mu(·)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">μ</span><span class="mopen">(</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mclose">)</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false">(</mo><mo separator="true">⋅</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sigma(·)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mpunct">⋅</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mclose">)</span></span></span></span> 如图4所示。<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121019373.png" alt="image.png"><br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121019358.png" alt="image.png"></p>
+<h3 id="3-2-2-组织纹理重建策略">3.2.2 组织纹理重建策略</h3>
+<hr>
+<p>甲状腺超声图像中正常与病变数据之间的转换问题可以简化为<strong>病灶数据的修复</strong>问题。</p>
+<p>通过公式3和7修复超声图像中的组织区域，并使用随机掩码训练 PT-GAN。<br>
+TTR 中的M是一个简单的 0-1 矩阵。使用带有结节的图像 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">S_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 训练生成器不会使模型生成结节。<br>
+因为：</p>
+<ol>
+<li>对于从病变数据到正常数据的转换，大多数研究基于一个假设[36]：使用正常数据训练的生成器可以去除病变，因为生成器尚未学习病变的分布。然而，超声图像独特的灵活性使得这一假设在超声图像中不成立。因此，对于结构不一致的数据建模，生成模型只能学习到相对均匀的组织纹理。</li>
+<li>根据结节大小筛选数据后，结节覆盖的区域较小，因此随机掩码导致绝大多数缺失区域为正常组织。尽管我们可以使掩码不与结节重叠，但发现即使不限制掩码的位置，也不会对生成器产生负面影响。</li>
+</ol>
+<h1 id="4-results">4. RESULTS</h1>
+<hr>
+<h2 id="4-1-dataset-and-experimental-setup">4.1 Dataset and experimental setup</h2>
+<hr>
+<p>本文中的甲状腺超声图像数据采集自天津医科大学肿瘤医院，包括8232张良性图像（BI，图2©）、9966张恶性图像（MI，图2(d)）和404张正常图像（NI，图2(b)），均由专业影像医师标注。<br>
+我们将数据集划分为不同子集以训练和测试 PTGAN 及分类器，如图5(a)所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131112380.png" alt="image.png"></p>
+<p>PTGAN的训练集包含4000张BI、6000张MI，验证集包含2000张BI、2000张MI。<br>
+我们选择VGG-19[37]作为辅助诊断模型。在正常-疾病实验中，我们将285张NI、1932张BI和1666张MI作为训练集，119张NI、300张BI和300张MI作为测试集，如图5(b)所示。<br>
+由于良性和恶性数据之间不存在不平衡，我们随机选取特定类别的部分数据人为制造不平衡情况，如图5(b)所示。</p>
+<p>首先，部分BI（700训练，300测试）和MI（3666训练，300测试）被作为数据集之一用于辅助诊断模型。<br>
+其次，部分MI（800训练，300测试）和BI（3932训练，300测试）被作为另一个不平衡数据集。<br>
+最后，生成的数据分别加入训练集，如图5(b)中的虚线框所示。</p>
+<p>输入图像大小为256×256像素，批量大小为6。</p>
+<p>PTM 和 RM 分别训练后进行联合优化。<br>
+每当训练稳定 5 次时，核大小 k 更新一次，即超参数 n 设置为5。<br>
+使用学习率为 10−4 的 Adam 优化器。设置 λp = λr = λc = 1，α 设置为 0.8，β 设置为 0.85。</p>
+<h2 id="4-2-normal-disease-data-augmentation">4.2 Normal-disease data augmentation</h2>
+<hr>
+<p>本实验中的输入图像被随机框掩码，且忽略了 CCS。<br>
+首先进行定性分析展示从疾病数据生成的正常数据结果，<br>
+然后通过定量分析证明 PGAM 对分类器的积极影响。</p>
+<h3 id="4-2-1-定性分析">4.2.1 定性分析</h3>
+<hr>
+<p>在图6中，我们展示了真实疾病图像（包括良性和恶性）、由 PTGAN 生成的图像、PTGAN 无 PTM、PTGAN 无 RM、PTGAN 无 PTM&amp;RM的生成图像。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131128731.png" alt="image.png"></p>
+<p>PTM 能够引导网络生成更有意义的结构和纹理。没有 PTM 的模型生成的结构和纹理更加混乱。<br>
+RM 使生成图像的细节更加真实，包括超声图像特有的斑点噪声。<br>
+我们使用相同的训练策略与最新的图像修复方法[38]、[39]进行比较，如图6的最后两行所示。显然，我们的方法在病变重建方面具有更优越的效果。<br>
+对于掩膜与动脉低回声区域相连的情况（第一列和第四列），现有方法无法重建被破坏的血管壁。我们的方法在有效恢复正常组织纹理的基础上，能够重建被掩膜的血管壁。</p>
+<p>图7展示了我们方法中带有掩膜皮肤纹理图像的重建过程。<br>
+第一行从左到右展示了结构和纹理的逐步重建。第二行从右到左展示了细化模块对超声图像细节优化的效果。<br>
+<img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131132446.png" alt="image.png"></p>
+<h3 id="4-2-2-定量分析">4.2.2 定量分析</h3>
+<hr>
+<p>由于疾病与正常数据之间缺乏匹配，我们在定性评估 PTGAN 效果时，<strong>随机选取区域对验证集中的图像进行修复，并比较了不同方法之间的PSNR和SSIM指标</strong>，如表I所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131138859.png" alt="image.png"></p>
+<p>我们还进行了数据增强实验，并与TA进行了对比，如表II所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131138901.png" alt="image.png"></p>
+<p>我们使用生成数据将训练集平衡至接近的数量，如图5(b)所示。</p>
+<h2 id="4-3-disease-data-augmentation">4.3 Disease data augmentation</h2>
+<hr>
+<p>在本实验中，输入图像通过固定框进行掩码处理，以遮挡结节。</p>
+<h3 id="4-3-1-定性分析">4.3.1 定性分析</h3>
+<hr>
+<p>我们通过消融实验验证了 PTM 对图像生成的影响以及 CCS 对 PTGAN 生成样本多样性的贡献，分别使用了PTGAN、PTGAN w/o PTM、PTGAN w/o CCS和PTGAN w/o PTM&amp;CCS进行实验。实验结果如图8所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131138604.png" alt="image.png"></p>
+<p>我们发现 PTM 能够引导生成器生成椭圆形的结节。<br>
+在缺少 PTM 的情况下，生成的结节会偏向于掩码的形状（矩形），如图8第二列所示。<br>
+在没有 PTM 约束的情况下，模型在结构和纹理的重建上会出现混淆，如图8第三列所示。<br>
+当掩码覆盖部分皮肤时，只有PTM能够使模型重建皮肤组织下的结节。反之，在没有PTM的情况下，皮肤纹理会在皮肤组织下重新生成。<br>
+CCS 使模型能够在条件概率下获得最大似然估计。生成结果的视觉效果在图8中无法清晰展示。</p>
+<p>因此，我们在图9中展示了不同采样条件下的多样性。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131138566.png" alt="image.png"></p>
+<p>随着采样均值的增加，生成结节的回声强度逐渐降低。<br>
+随着采样方差的增加，生成结节中的实性成分逐渐增加。</p>
+<p>因此，我们通过采样不同均值和方差的良性和恶性结节分布，重建了多样且合理分布的新数据。</p>
+<h3 id="4-3-2-定量分析">4.3.2 定量分析</h3>
+<hr>
+<p>为了证明我们的方法能够缓解不同疾病之间的数据不平衡问题，我们选择了一小部分良性数据和全部恶性数据进行实验。<br>
+通过随机选择样本生成新的良性图像。整个过程没有引入额外的样本。<br>
+实验结果如表III所示，表中的 IC 表示不平衡类别，即数据集中稀缺的数据。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131905055.png" alt="image.png"></p>
+<p>此外，我们还对恶性数据进行了数据增强实验，使其数据量与良性数据的数据增强设置大致相同。可以看出（表IV），我们的方法对每个类别具有相同的增强效果。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131906446.png" alt="image.png"></p>
+<p>表IV中的 NPV 表示阴性预测值，即 TN/(TN + FN) 。<br>
+在<strong>良性数据稀缺</strong>的情况下，模型倾向于<strong>陷入偏向恶性类别的局部最优解</strong>。因此，我们选择假阳性率（FPR）和精确率来衡量不同增强方法的效果。可以看出，我们的方法能够显著减少假阳性。<br>
+当<strong>恶性数据稀缺</strong>时，我们选择假阴性率（FNR）和NPV。结果表明，当我们的方法与 TA 结合时，可以获得最高的准确率。然而，在FPR和FNR方面，我们的方法最大限度地减少了数据偏差的不良影响。</p>
+<p>此外，为了证明我们的方法在解决数据不平衡问题上的能力，我们在恶性数据不平衡的情况下进行了多次不同稀缺程度的实验。具体而言，通过将训练集中的恶性数据数量分别限制为800、900、1000、1100和1200，并在有足够良性数据的情况下进行实验，结果如图10所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131910563.png" alt="image.png"></p>
+<p>图中的橙色虚线显示了未进行人工移除时分类器的准确率（3932 BI，3666 MI）。<br>
+可以看出，我们的方法始终优于TA。一旦恶性数据的比例达到一定程度（1200:3932），这两种增强方法的结合使分类器的性能超过了使用真实且平衡数据训练的模型。</p>
+<h2 id="4-4-weakly-supervised-segmentation">4.4 Weakly supervised segmentation</h2>
+<hr>
+<p>完成了基于严格点标注的弱监督病灶分割任务。<br>
+当疾病图像中的病灶被修复为正常组织时，原始图像与生成图像之间的差异绝对值可以表示像素的异常程度，即病灶的存在。<br>
+通过设定阈值为0.1，将这一差异转化为二值预测，如图11所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131913971.png" alt="image.png"></p>
+<p>此外，我们与其他弱监督分割方法进行了IOU和Dice的比较，结果表明我们的方法表现更优，如表V所示。</p>
+<p><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503131914762.png" alt="image.png"></p>
+<p>CAM [40] 表示在弱监督分割任务中生成种子点的方法，<br>
+CIAN [41] 则是基于优化CAM的重新训练方法。<br>
+这两种方法的阈值均设置为0.6。</p>
+<h1 id="5-conclusion">5. CONCLUSION</h1>
+<hr>
+<p>提出了一种渐进式生成对抗数据增强方法，<br>
+包括<strong>渐进式纹理生成对抗网络</strong>和<strong>基于掩模重建的图像数据增强策略</strong>。</p>
+<p>以结构不完整的甲状腺超声图像为研究对象，基于掩模重建的图像生成方法生成了具有合理结构的真实正常数据和良恶性数据。同时，该方法兼顾了生成样本的多样性和合理性，在图像生成的真实性和数据增强效果方面表现出色。整个方法充分利用了超声检查中的点标注和图像级信息，无需任何额外的标注工作。</p>
+<p>该方法仍有一些可优化的方面。<br>
+例如，将 PTM 与损失函数结合，使整个过程摆脱超参数的限制。此外，该方法的局限性在于其依赖于图像中的原始结构信息，即图像中的病变/结节不能过大。因此，如何充分挖掘结构不完整图像中过于灵活的结构信息是下一步亟待解决的问题。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yanqinglei.github.io">BulingQAQ</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yanqinglei.github.io/gan-apga/">https://yanqinglei.github.io/gan-apga/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yanqinglei.github.io" target="_blank">BulingQAQ的个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GAN/">GAN</a></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/gan-daga/" title="【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503101140173.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/gan-daga/" title="【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503101140173.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-13</div><div class="title">【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion</div></div></a></div><div><a href="/gan-itfm/" title="【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503050919044.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-05</div><div class="title">【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation</div></div></a></div><div><a href="/gan-itit/" title="【论文阅读】Image-to-Image Translation with Conditional Adversarial Networks"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202409072345976.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-09</div><div class="title">【论文阅读】Image-to-Image Translation with Conditional Adversarial Networks</div></div></a></div><div><a href="/gan-gan/" title="【论文阅读】Generative Adversarial Nets"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202409182316153.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-18</div><div class="title">【论文阅读】Generative Adversarial Nets</div></div></a></div><div><a href="/gan-bmsg/" title="【论文阅读】Bone metastasis scintigram generation using generative adversarial learning with multi‐receptive field learning and two‐stage training"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202409092216234.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-10</div><div class="title">【论文阅读】Bone metastasis scintigram generation using generative adversarial learning with multi‐receptive field learning and two‐stage training</div></div></a></div><div><a href="/gan-hris/" title="【论文阅读】High-Resolution Image Synthesis and Semantic Manipulation with Conditional GANs"><img class="cover" src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202409121843542.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-12</div><div class="title">【论文阅读】High-Resolution Image Synthesis and Semantic Manipulation with Conditional GANs</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/spy_family_avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">BulingQAQ</div><div class="author-info__description">不知归路，宁愿一世无悔追逐</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YanQinglei"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/YanQinglei" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://blog.csdn.net/OctYZ" target="_blank" title="CSDN"><i class="fa fa-book-open"></i></a><a class="social-icon" href="tencent://AddContact/?fromId=45&amp;fromSubId=1&amp;subcmd=all&amp;uin=1819615836&amp;website=www.oicqzone.com" target="_blank" title="QQ"><i class="fab fa-qq"></i></a><a class="social-icon" href="mailto:1819615836@qq.com" target="_blank" title="Email"><i class="fas fa-envelope-open-text"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">请多多指教</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0-abstract"><span class="toc-text">0. Abstract</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%EF%BC%9A"><span class="toc-text">背景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%EF%BC%9A"><span class="toc-text">工作：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%EF%BC%9A"><span class="toc-text">结果：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-introduction"><span class="toc-text">1. INTRODUCTION</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-related-works"><span class="toc-text">2. RELATED WORKS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-gan-for-medical-data-augmentation"><span class="toc-text">2.1 GAN for medical data augmentation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-gan-based-image-inpainting-method"><span class="toc-text">2.2 GAN-based Image Inpainting Method</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-methods"><span class="toc-text">3. METHODS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-progressive-texture-gan-overview"><span class="toc-text">3.1 Progressive Texture GAN Overview</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-%E6%B8%90%E8%BF%91%E7%BA%B9%E7%90%86%E6%A8%A1%E5%9D%97"><span class="toc-text">3.1.1 渐近纹理模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-%E7%B2%BE%E7%82%BC%E6%A8%A1%E5%9D%97"><span class="toc-text">3.1.2 精炼模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-image-data-augmentation-strategy-overview"><span class="toc-text">3.2 Image Data Augmentation Strategy Overview</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%88%AB%E6%95%8F%E6%84%9F%E7%AD%96%E7%95%A5"><span class="toc-text">3.2.1 条件类别敏感策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-%E7%BB%84%E7%BB%87%E7%BA%B9%E7%90%86%E9%87%8D%E5%BB%BA%E7%AD%96%E7%95%A5"><span class="toc-text">3.2.2 组织纹理重建策略</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-results"><span class="toc-text">4. RESULTS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-dataset-and-experimental-setup"><span class="toc-text">4.1 Dataset and experimental setup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-normal-disease-data-augmentation"><span class="toc-text">4.2 Normal-disease data augmentation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-%E5%AE%9A%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-text">4.2.1 定性分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-%E5%AE%9A%E9%87%8F%E5%88%86%E6%9E%90"><span class="toc-text">4.2.2 定量分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-disease-data-augmentation"><span class="toc-text">4.3 Disease data augmentation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1-%E5%AE%9A%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-text">4.3.1 定性分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-2-%E5%AE%9A%E9%87%8F%E5%88%86%E6%9E%90"><span class="toc-text">4.3.2 定量分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-weakly-supervised-segmentation"><span class="toc-text">4.4 Weakly supervised segmentation</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-conclusion"><span class="toc-text">5. CONCLUSION</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/gan-apga/" title="A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation"><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503121106369.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation"/></a><div class="content"><a class="title" href="/gan-apga/" title="A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation">A Progressive Generative Adversarial Method for Structurally Inadequate Medical Image Data Augmentation</a><time datetime="2025-03-13T11:21:07.000Z" title="发表于 2025-03-13 19:21:07">2025-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/gan-daga/" title="【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion"><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503101140173.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion"/></a><div class="content"><a class="title" href="/gan-daga/" title="【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion">【论文阅读】DSAGAN：A generative adversarial network based on dualstream attention mechanism for anatomical and functional image fusion</a><time datetime="2025-03-13T11:17:52.000Z" title="发表于 2025-03-13 19:17:52">2025-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/gan-itfm/" title="【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation"><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503050919044.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation"/></a><div class="content"><a class="title" href="/gan-itfm/" title="【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation">【论文阅读】Image Translation for Medical Image Generation：Ischemic Stroke Lesion Segmentation</a><time datetime="2025-03-05T06:24:58.000Z" title="发表于 2025-03-05 14:24:58">2025-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/image-synthesis-review-dlaf/" title="【论文阅读】Deep Learning Approaches for Data Augmentation in Medical Imaging：A Review"><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503021507800.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【论文阅读】Deep Learning Approaches for Data Augmentation in Medical Imaging：A Review"/></a><div class="content"><a class="title" href="/image-synthesis-review-dlaf/" title="【论文阅读】Deep Learning Approaches for Data Augmentation in Medical Imaging：A Review">【论文阅读】Deep Learning Approaches for Data Augmentation in Medical Imaging：A Review</a><time datetime="2025-03-03T07:43:01.091Z" title="发表于 2025-03-03 15:43:01">2025-03-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/gan-sdat/" title="【论文阅读】Synthetic data accelerates the development of generalizable learning-based algorithms for X-ray image analysis"><img src="https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202503011627746.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【论文阅读】Synthetic data accelerates the development of generalizable learning-based algorithms for X-ray image analysis"/></a><div class="content"><a class="title" href="/gan-sdat/" title="【论文阅读】Synthetic data accelerates the development of generalizable learning-based algorithms for X-ray image analysis">【论文阅读】Synthetic data accelerates the development of generalizable learning-based algorithms for X-ray image analysis</a><time datetime="2025-03-02T02:21:15.559Z" title="发表于 2025-03-02 10:21:15">2025-03-02</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://raw.githubusercontent.com/YanQinglei/blog-img/main/img202409021053834.png')"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By BulingQAQ</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
